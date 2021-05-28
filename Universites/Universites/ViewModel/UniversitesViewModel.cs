@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Universites.Classes;
 using Universites.Models;
@@ -18,7 +16,9 @@ namespace Universites.ViewModel
         {
             Task.Run(async () => await LoadData());
 
-            CountryChangedCommand = new RelayCommand(obj => CountryChanged());
+            CountrySelectedCommand = new RelayCommand(obj => CountryChanged());
+            NavigateCommand = new RelayCommand(obj => Navigate());
+            UniversitySelectedCommand = new RelayCommand(obj => SelectedUniversityChanged());
         }
         private ICollection<University> universites;
         public ICollection<University> Universites
@@ -55,8 +55,31 @@ namespace Universites.ViewModel
             }
         }
 
+        private string universityUrl;
+        public string UniversityUrl
+        {
+            get { return universityUrl; }
+            set
+            {
+                universityUrl = value;
+                OnPropertyChanged("UniversityUrl");
+            }
+        }
 
-        public RelayCommand CountryChangedCommand { get; }
+        private University selectionUniversity;
+        public University SelectionUniversity
+        {
+            get { return selectionUniversity; }
+            set
+            {
+                selectionUniversity = value;
+                OnPropertyChanged("SelectionUniversity");
+            }
+        }
+
+        public RelayCommand CountrySelectedCommand { get; }
+        public RelayCommand NavigateCommand { get; }
+        public RelayCommand UniversitySelectedCommand { get; }
 
 
         private async Task LoadData()
@@ -87,12 +110,29 @@ namespace Universites.ViewModel
             }
         }
 
+        private void Navigate()
+        {
+
+        }
+
         private void CountryChanged()
         {
             Universites = AllUniversites;
 
             if (selectionCountry.Name != "All countries")
                 Universites = Universites.Where(i => i.Country == SelectionCountry.Name).ToList();
+        }
+
+        private void SelectedUniversityChanged()
+        {
+            try
+            {
+                UniversityUrl = selectionUniversity.WebPages[0];
+            }
+            catch
+            {
+                universityUrl = "";
+            }
         }
 
 
