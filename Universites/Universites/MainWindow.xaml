@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Universites"
         xmlns:context="clr-namespace:Universites.ViewModel"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Window.DataContext>
@@ -17,15 +18,21 @@
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <ComboBox Width="150" Margin="10" DisplayMemberPath="Name" ItemsSource="{Binding Countries}" SelectedIndex="0"/>
+            <ComboBox Width="150" Margin="10" DisplayMemberPath="Name" ItemsSource="{Binding Countries}" SelectedIndex="0" SelectedItem="{Binding SelectionCountry}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <i:InvokeCommandAction Command="{Binding CountryChangedCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ComboBox>
         </StackPanel>
-        
+
         <ListView ItemsSource="{Binding Universites}" Grid.Row="1" BorderBrush="Black" BorderThickness="1" Margin="10, 20">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Name}" Foreground="DarkOrange" Margin="5"/>
-                        <TextBlock Text="{Binding Country}" Margin="5"/>
+                        <TextBlock Text="{Binding Name}"  Margin="5"/>
+                        <TextBlock Text="{Binding Country}" Foreground="DarkOrange" Margin="5"/>
                     </StackPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>

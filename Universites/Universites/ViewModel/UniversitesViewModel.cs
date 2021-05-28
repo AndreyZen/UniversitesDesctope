@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Universites.Classes;
 using Universites.Models;
 
 namespace Universites.ViewModel
@@ -15,10 +16,9 @@ namespace Universites.ViewModel
     {
         public UniversitesViewModel()
         {
-            Task.Run(async () =>
-             {
-                 await LoadData();
-             });
+            Task.Run(async () => await LoadData());
+
+            CountryChangedCommand = new RelayCommand(obj => CountryChanged());
         }
         private ICollection<University> universites;
         public ICollection<University> Universites
@@ -31,6 +31,8 @@ namespace Universites.ViewModel
             }
         }
 
+        private ICollection<University> AllUniversites;
+
         private ICollection<Country> countries;
         public ICollection<Country> Countries
         {
@@ -41,6 +43,22 @@ namespace Universites.ViewModel
                 OnPropertyChanged("Countries");
             }
         }
+
+        private Country selectionCountry;
+        public Country SelectionCountry
+        {
+            get { return selectionCountry; }
+            set
+            {
+                selectionCountry = value;
+                OnPropertyChanged("SelectionCountry");
+            }
+        }
+
+
+        public RelayCommand CountryChangedCommand { get; }
+
+
         private async Task LoadData()
         {
             string url = "http://universities.hipolabs.com/search?country=";
@@ -55,17 +73,28 @@ namespace Universites.ViewModel
                 var content = await response.Content.ReadAsStringAsync();
 
                 Universites = JsonConvert.DeserializeObject<BindingList<University>>(content);
-                
+                Universites = Universites.OrderBy(i => i.Name).ToList();
+                AllUniversites = Universites;
+
                 Countries = new List<Country>();
                 countries.Add(new Country { Name = "All countries" });
-                foreach(var item in Universites.OrderBy(i => i.Country).ToList().GroupBy(i => i.Country).ToList())
-                    Countries.Add(new Country { Code = item.First().alpha_two_code, Name = item.First().Country });
+                foreach (var item in Universites.OrderBy(i => i.Country).ToList().GroupBy(i => i.Country).ToList())
+                    Countries.Add(new Country { Code = item.First().AlphaTwoCode, Name = item.First().Country });
             }
             catch (Exception)
             {
 
             }
         }
+
+        private void CountryChanged()
+        {
+            Universites = AllUniversites;
+
+            if (selectionCountry.Name != "All countries")
+                Universites = Universites.Where(i => i.Country == SelectionCountry.Name).ToList();
+        }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged(string prop = "")

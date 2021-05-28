@@ -11,13 +11,16 @@ namespace Universites.Models
     {
         [JsonProperty("country")]
         public string Country { get; set; }
-        public string[] domains { get; set; }
+        [JsonProperty("domains")]
+        public string[] Domains { get; set; }
         [JsonProperty("web_pages")]
         public string[] WebPages { get; set; }
-        public string alpha_two_code { get; set; }
+        [JsonProperty("alpha_two_code")]
+        public string AlphaTwoCode { get; set; }
         [JsonProperty("name")]
         public string Name { get; set; }
-        public string stateprovince { get; set; }
+        [JsonProperty("stateprovince")]
+        public string StateProvince { get; set; }
     }
 
 }
